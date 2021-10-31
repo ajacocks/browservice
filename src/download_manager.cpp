@@ -121,8 +121,14 @@ DownloadManager::DownloadManager(CKey,
     nextFileIdx_ = 1;
 }
 
+/*
+src/download_manager.cpp:125:45: note: use non-reference type 'const std::pair<unsigned int, browservice::DownloadManager::DownloadInfo>' to make the copy explicit or 'const std::pair<const unsigned int, browservice::DownloadManager::DownloadInfo>&' to prevent copying
+src/download_manager.cpp: In member function 'void browservice::DownloadManager::downloadProgressChanged_()':
+*/
+
 DownloadManager::~DownloadManager() {
-    for(const pair<uint32_t, DownloadInfo>& p : infos_) {
+//    for(const pair<uint32_t, DownloadInfo>& p : infos_) {
+    for(const std::pair<uint32_t, browservice::DownloadManager::DownloadInfo>& p : infos_) {
         const DownloadInfo& info = p.second;
         if(!info.startCallback) {
             if(info.cancelCallback) {
@@ -182,9 +188,17 @@ void DownloadManager::pendingDownloadCountChanged_() {
     );
 }
 
+/*
+src/download_manager.cpp:187:45: error: loop variable 'elem' of type 'const std::pair<unsigned int, browservice::DownloadManager::DownloadInfo>&' binds to a temporary constructed from type 'std::pair<const unsigned int, browservice::DownloadManager::DownloadInfo>' [-Werror=range-loop-construct]
+  187 |     for(const pair<uint32_t, DownloadInfo>& elem : infos_) {
+      |                                             ^~~~
+src/download_manager.cpp:187:45: note: use non-reference type 'const std::pair<unsigned int, browservice::DownloadManager::DownloadInfo>' to make the copy explicit or 'const std::pair<const unsigned int, browservice::DownloadManager::DownloadInfo>&' to prevent copying
+*/
+
 void DownloadManager::downloadProgressChanged_() {
     vector<pair<int, int>> pairs;
-    for(const pair<uint32_t, DownloadInfo>& elem : infos_) {
+//    for(const pair<uint32_t, DownloadInfo>& elem : infos_) {
+    for(const std::pair<uint32_t, browservice::DownloadManager::DownloadInfo>& elem : infos_) {
         if(!elem.second.startCallback) {
             pairs.emplace_back(elem.second.fileIdx, elem.second.progress);
         }
